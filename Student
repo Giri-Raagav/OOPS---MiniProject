@@ -1,0 +1,28 @@
+package Giri;
+
+public class Student {
+    private String id;
+    private String name;
+    private double totalFee;
+    private double paidFee;
+    private double dueFee;
+
+    public Student(String id, String name, double totalFee, double paidFee) {
+        this.id = id;
+        this.name = name;
+        this.totalFee = totalFee;
+        this.paidFee = paidFee;
+        this.dueFee = totalFee - paidFee;
+    }
+
+    public String getId() { return id; }
+    public String getName() { return name; }
+    public double getTotalFee() { return totalFee; }
+    public double getPaidFee() { return paidFee; }
+    public double getDueFee() { return dueFee; }
+
+    public void setPaidFee(double paidFee) {
+        this.paidFee = paidFee;
+        this.dueFee = totalFee - paidFee;
+    }
+}
