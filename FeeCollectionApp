@@ -1,0 +1,113 @@
+package Giri;
+
+import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
+public class FeeCollectionApp extends Application {
+
+    private TableView<Student> table;
+    private ObservableList<Student> data;
+
+    private TextField idField, nameField, totalFeeField, paidFeeField, payField;
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Student Fee Collection System");
+
+        // Input Fields
+        idField = new TextField(); idField.setPromptText("Student ID");
+        nameField = new TextField(); nameField.setPromptText("Name");
+        totalFeeField = new TextField(); totalFeeField.setPromptText("Total Fee");
+        paidFeeField = new TextField(); paidFeeField.setPromptText("Paid Fee");
+
+        Button addBtn = new Button("Add Student");
+        addBtn.setOnAction(e -> addStudent());
+
+        HBox inputBox = new HBox(10, idField, nameField, totalFeeField, paidFeeField, addBtn);
+        inputBox.setPadding(new Insets(10));
+
+        // Table
+        TableColumn<Student, String> idCol = new TableColumn<>("ID");
+        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+
+        TableColumn<Student, String> nameCol = new TableColumn<>("Name");
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        TableColumn<Student, Double> totalCol = new TableColumn<>("Total Fee");
+        totalCol.setCellValueFactory(new PropertyValueFactory<>("totalFee"));
+
+        TableColumn<Student, Double> paidCol = new TableColumn<>("Paid Fee");
+        paidCol.setCellValueFactory(new PropertyValueFactory<>("paidFee"));
+
+        TableColumn<Student, Double> dueCol = new TableColumn<>("Due Fee");
+        dueCol.setCellValueFactory(new PropertyValueFactory<>("dueFee"));
+
+        table = new TableView<>();
+        table.getColumns().addAll(idCol, nameCol, totalCol, paidCol, dueCol);
+        data = FXCollections.observableArrayList();
+        table.setItems(data);
+
+        // Payment Section
+        payField = new TextField();
+        payField.setPromptText("Enter Payment Amount");
+
+        Button payBtn = new Button("Pay Fee");
+        payBtn.setOnAction(e -> payFee());
+
+        HBox payBox = new HBox(10, payField, payBtn);
+        payBox.setPadding(new Insets(10));
+
+        VBox layout = new VBox(10, inputBox, table, payBox);
+        layout.setPadding(new Insets(10));
+
+        Scene scene = new Scene(layout, 800, 500);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void addStudent() {
+        try {
+            String id = idField.getText();
+            String name = nameField.getText();
+            double total = Double.parseDouble(totalFeeField.getText());
+            double paid = Double.parseDouble(paidFeeField.getText());
+
+            data.add(new Student(id, name, total, paid));
+            idField.clear(); nameField.clear();
+            totalFeeField.clear(); paidFeeField.clear();
+        } catch (Exception e) {
+            showAlert("Error", "Please enter valid values for all fields.");
+        }
+    }
+
+    private void payFee() {
+        Student selected = table.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            try {
+                double amount = Double.parseDouble(payField.getText());
+                selected.setPaidFee(selected.getPaidFee() + amount);
+                table.refresh();
+                payField.clear();
+            } catch (Exception e) {
+                showAlert("Error", "Enter a valid amount!");
+            }
+        } else {
+            showAlert("No Selection", "Please select a student to make payment.");
+        }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+}
